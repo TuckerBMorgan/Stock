@@ -1,0 +1,1 @@
+obj = http://finance.google.com/finance/info?client=ig&q=NASDAQ:GOOG
