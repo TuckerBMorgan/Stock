@@ -1,59 +1,55 @@
 import ystockquote;
 
+class Stock
+	cost = 0;
+	count = 0;
+	ticker = " ";
+
 class StockInfo():
 	capital = 0;
-	stocks = {}
+	stocks = [];
+	fileName = "";
 
-	def createStock(self, file):
-		value = open(file, 'r');
+	def createStock(self, file_):
+		self.fileName = file_;
+		value = open(file_, 'r');
 		lines = tuple(value);
 		self.capital = float(lines[0]);
 		count = 0;
 		for v in lines:
 			if count > 0:
 				words = v.split(':');
-				self.stocks[words[0]] = float(words[1]);
+				cls = Stock();
+				cls.cost = float(words[2]);
+				cls.count = float(words[1]);
+				cls.ticker = words[0];
+				self.stocks.append(cls);
 			count+=1;
+		value.close();
 
 	def printStockAmount(self):
 		for k,v in self.stocks.items():
-			print(str(v) + " of " +  k + " for a value of "  + str(float(ystockquote.get_price(k)) * v))
+			print(str(v) + " of " +  k + " for a value of "  + str(float(ystockquote.get_price(k)) * v));
 
 	def buyStockIfPossible(self):
 		for k,v in self.stocks.items():
 			cost = float(ystockquote.get_price(k));
 			if(cost < self.capital):
-				self.stocks[k] = v + 1;
-				self.capital -= cost;
+				count = int(self.capital / cost);
+				self.stocks[k] = v + count;
+				self.capital -= cost * count;
 
 	def writeInfo(self):
-		
+		writing = open(self.fileName, 'w');
+		writing.write(str(self.capital) + "\n");
+		for k,v in self.stocks.items():
+			writing.write(k + ":" + str(v) + "\n");
+
 
 sto = StockInfo();
-
-
 txt = "values.txt"
 sto.createStock(txt);
 sto.printStockAmount();
 sto.buyStockIfPossible();
 sto.printStockAmount();
-
-
-#capital = float(lines[0])
-
-#stockCount = float(lines[1])
-
-#stockCost = ystockquote.get_price('TSLA');
-
-#if float(stockCost) < capital:
-#	stockCount+=1;
-#	capital-=float(stockCost);
-
-
-#values = open("values.txt", 'w')
-#values.write(str(capital) + "\n");
-#values.write(str(stockCount));
-
-#print("Current Capital " + str(capital) + "\n");
-#print("Current Number of stocks " + str(stockCost) + "\n");
-#print("Current Value of portfolio " + str(float(stockCost) * stockCount) + "\n")
+sto.writeInfo();
